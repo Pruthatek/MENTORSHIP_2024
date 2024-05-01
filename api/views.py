@@ -1,10 +1,11 @@
 import json
+from datetime import datetime
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render
 from jsonschema import ValidationError
 from openpyxl import load_workbook
 from django.contrib.auth import models as usr
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.core import serializers
 from .models import *
 from django.views.decorators.csrf import csrf_exempt,csrf_protect
@@ -109,145 +110,6 @@ def import_from_excel(request):
             return HttpResponse(json.dumps({"msg": "An error occurred while importing data."}), content_type="application/json")
 
     return HttpResponse(json.dumps({"msg": "Your details updated successfully."}), content_type="application/json")
-
-
-# def import_from_excel(request):
-#     if request.method == 'POST':
-#         try:
-#             excel_file = request.FILES['excel_file']
-#             student_photo = request.FILES['photo']
-#             father_photo = request.FILES['father_photo']
-#             mother_photo = request.FILES['mother_photo']
-#             with load_workbook(excel_file) as wb:
-           
-#                 ws = wb.active
-#                 students_to_create = []
-#                 for row in ws.iter_rows(min_row=2, values_only=True):
-#                     name, enrollment, father_name,mother_name, mentoring_started_year, department, email, caste, gender, weight, height, address, city, state, pincode, student_contact, father_contact, mother_contact, father_occupation, mother_occupation, hobbies, nationality, sport, overall_10th, overall_12th, diploma, study_semester, *other_fields = row
-#                     try:
-#                         student = Student(
-#                             name=name,
-#                             enrollment=enrollment,
-#                             student_photo=student_photo,
-#                             study_semester=study_semester,
-#                             father_photo=father_photo,
-#                             father_name=father_name,
-#                             mother_name=mother_name,
-#                             mother_photo=mother_photo,
-#                             mentoring_started_year=mentoring_started_year,
-#                             department=department,
-#                             email=email,
-#                             caste=caste,
-#                             gender=gender,
-#                             weight=weight,
-#                             height=height,
-#                             address=address,
-#                             city=city,
-#                             state=state,
-#                             pincode=pincode,
-#                             student_contact=student_contact,
-#                             father_contact=father_contact,
-#                             mother_contact=mother_contact,
-#                             father_occupation=father_occupation,
-#                             mother_occupation=mother_occupation,
-#                             hobbies=hobbies,
-#                             nationality=nationality,
-#                             sport=sport,
-#                             overall_10th=overall_10th,
-#                             overall_12th=overall_12th,
-#                             diploma=diploma,
-#                             **{field_name: field_value for field_name, field_value in zip(other_fields)}
-#                         )
-#                         students_to_create.append(student)
-#                     except ValidationError as e:
-#                         # Log the validation error
-#                         print(f"Validation error for row {row}: {e}")
-#                 Student.objects.bulk_create(students_to_create)
-           
-#             return HttpResponse(json.dumps({"msg": "Your details updated successfully."}), content_type="application/json")
-#         except Exception as e:
-#             # Log the exception
-#             print(f"An error occurred: {e}")
-#             return HttpResponse(json.dumps({"msg": "An error occurred while importing data."}), content_type="application/json")
-
-#     return HttpResponse(json.dumps({"msg": "Your details updated successfully."}), content_type="application/json")
-
-# @csrf_exempt
-# def signup(request):
-#     if request.method == "POST":
-#         # Fetch signup data
-#         username = request.POST.get('username')
-#         fname = request.POST.get('name')
-#         lname = request.POST.get('lname')
-#         email = request.POST.get('email')
-#         pass1 = request.POST.get('pass1')
-#         user_type = request.POST.get('user_type')
-#         print(user_type)
-
-#         # Validations (same as original, plus validate user_type)
-#         if User.objects.filter(username=username).exists():
-#             messages.error(request, "")
-#             return HttpResponse(json.dumps({"msg": "Username already exist! Please try some other username."}), content_type="application/json")
-        
-#         if User.objects.filter(email=email).exists():
-#             messages.error(request, "Email Already Registered!!")
-#             return HttpResponse(json.dumps({"msg": "Email Already Registered!!"}), content_type="application/json")
-
-#         if not user_type or user_type not in [choice[0] for choice in UserProfile.USER_CHOICES]:
-#             messages.error(request, "Please select a valid user type")
-#             return HttpResponse(json.dumps({"msg": "Please select a valid user type"}), content_type="application/json")
-
-#         # Create basic Django User
-#         user = User.objects.create_user(username, email, pass1)
-#         user.first_name = fname
-#         user.last_name = lname
-#         print("save")
-#         user.save()
-
-#         usr2 = usr.User.objects.create_user(username, email, pass1)
-#         usr2.first_name = fname
-#         usr2.last_name = lname
-#         usr2.save()
-
-#         user_profile = UserProfile(user=user, user_type=user_type)
-#         user_profile.save()
-
-#         if user_type == 'Chairman':
-#             chairman = Chairman(user=user)
-#             chairman.name = username
-#             chairman.email = email
-#             chairman.save()
-
-#         elif user_type == 'Principal':
-#             principal = Principal(user=user)
-#             principal.name = username
-#             principal.email = email
-#             principal.college = request.POST.get("college")
-#             principal.education = request.POST.get("education")
-#             principal.save()
-
-#         elif user_type == 'HOD':
-#             hod = HOD(user=user)
-#             print(user_type)
-#             hod.name = username
-#             hod.email = email
-#             hod.department = request.POST.get("department")
-#             hod.education = request.POST.get("education")
-#             hod.save()
-
-#         elif user_type == 'Mentor':
-#             mentor = Mentor(user=user)
-#             mentor.name = username
-#             mentor.email = email
-#             mentor.department = request.POST.get("department")
-#             mentor.mentoring_class = request.POST.get("mentoring_calss")
-#             mentor.number_of_students = request.POST.get("number_of_students")
-#             mentor.save()
-
-#         messages.success(request, "Your Account has been created succesfully!!")
-#         return HttpResponse(json.dumps({"msg": "Your details have been updated successfully."}), content_type="application/json")
-
-#     return render(json.dumps({"msg": "Your Account has been created succesfully!!"}), content_type="application/json") 
 
 @csrf_exempt
 def signup(request):
@@ -389,6 +251,23 @@ def students(request):
         return HttpResponse(json.dumps({"data": data}),content_type="application/json")
     else:
         HttpResponse(json.dumps({"data": "Invalid req"}),content_type="application/json")
+        
+        
+@csrf_exempt
+def specificStudent(request):
+    if request.method == "POST":
+        semester = request.POST.get("enrollment")
+        studentsof = Student.objects.filter(enrollment=semester).all()
+        data = serializers.serialize("json", studentsof)
+        z = len(data)
+        print(z)
+        if z!=0 :
+             return HttpResponse(json.dumps({"data": data , 'status':"true"}),content_type="application/json")
+        else :
+            return HttpResponse(json.dumps({"data": "Student Not found",'status':"false"}),content_type="application/json")
+    else:
+        HttpResponse(json.dumps({"data": "Student Not found",'status':"false"}),content_type="application/json")
+
 
 
 @csrf_exempt
@@ -396,14 +275,14 @@ def signin(request):
       if request.method == 'POST':
         username = request.POST['username']
         pass1 = request.POST['pass1']
-        user = request.POST['usertype']
+       
         
         user = authenticate(username=username, password=pass1, user_type=user)
         
         if user is not None:
             login(request, user)
             fname = user.first_name
-            return HttpResponse(json.dumps({"msg": " Sucessfully Logged In ","status":True}),content_type="application/json",)
+            return HttpResponse(json.dumps({"msg": " Sucessfully Logged In ","status":True, "user_type" : user.user_type}),content_type="application/json",)
             messages.success(request, "Logged In Sucessfully!!")
             
         else:
@@ -429,28 +308,6 @@ def mentors(request):
         mentors = Mentor.objects.filter(college=colleges.pk, department=departments.pk)
         data = serializers.serialize("json", mentors)
         return HttpResponse(json.dumps({"data": data}), content_type="application/json")
-
-# def mentors(request):
-#     if request.method == "GET":
-#         college_name = request.POST.get("college")
-#         department_name = request.POST.get("department")
-        
-#         college = College.objects.filter(name=college_name).first()
-#         department = Department.objects.filter(department_title=department_name).first()
-        
-#         if college and department:
-#             mentors = Mentor.objects.filter(college=1, department=1)
-#             data = [{"college": mentor.college.name, "department": mentor.department.department_title, **json.loads(serializers.serialize("json", [mentor]))[0]["fields"]} for mentor in mentors]
-#             return HttpResponse(json.dumps({"data": data}), content_type="application/json")
-#         else:
-#             return HttpResponse(json.dumps({"error": "College or department not found"}),status=400)
-
-
-# def departments(request):
-#     if request.method == "GET":
-#         departments = Department.objects.all()
-#         data = serializers.serialize("json", departments)
-#         return HttpResponse(json.dumps({"data": data}), content_type="application/json")
     
 @csrf_exempt
 def departments(request):
@@ -462,18 +319,7 @@ def departments(request):
         return HttpResponse(json.dumps({"data": data}), content_type="application/json")
     
     
-# results HOD
-@csrf_exempt
-# def result(request):
-#     if request.method == "POST":
-#         semester = request.POST.get("semester")
-#         # type_of_exam = request.POST.get("type_of_exam")
-#         student = request.POST.get("student")
-# #   type_of_exam=type_of_exam,
-#         students = Student.objects.filter(name=student).first()
-#         results = Result.objects.filter(semester=semester,student=students.pk).all()
-#         data = serializers.serialize("json",results)
-#         return HttpResponse(json.dumps({"data" : data}), content_type="application/json")
+
     
     
     
@@ -547,29 +393,6 @@ def addStudent(request):
     else:
         return HttpResponse(json.dumps({"msg": "Bad request"}))
     
-    
-    
-# @csrf_exempt   
-# def resultExcel(request):
-#     if request.method == "POST":
-#         file = request.FILES['excel_file']
-#         try:
-#             df = pd.read_excel(file)
-#             subject_columns = [col for col in df.columns if col.startswith('subject')]
-#             for index, row in df.iterrows():
-#                 student_name = row['student']
-#                 exam_type = row['exam type']
-#                 student, created = Student.objects.get_or_create(name=student_name)
-#                 for subject_column in subject_columns:
-#                     subject_name = row[subject_column]
-#                     result, created = Result.objects.get_or_create(student=student, subject_name=subject_name, type_of_exam=exam_type, defaults={'subject_name': subject_name})
-#                     print(f"Processed {student_name}, Subject: {subject_name}, Exam Type: {exam_type}")
-#                     return HttpResponse(json.dumps({"Message": "Success"}))
-                
-#         except Exception as e:
-#             print(f"Error: {e}")
-#             return HttpResponse(json.dumps({"Error": e}))
-    
 @csrf_exempt
 def resultExcel(request):
     if request.method == "POST":
@@ -618,47 +441,165 @@ def resultExcel(request):
     else:
         return HttpResponse(json.dumps({"Error": "Only POST requests are allowed"}), status=405)
 
+@csrf_exempt
+def createStudentProfile(request):
+    if request.method == "POST":
+        enrollment = request.POST.get("enrollment")
+        password = request.POST.get("password")
+
+        users = Student.objects.get(enrollment=enrollment)
+
+        studentProfile = StudentProfile.objects.create(
+            username=enrollment,
+            student_instance=users,
+            password=password
+        )
+
+        return HttpResponse(json.dumps({"Message": "Student Profile Created"}))
+    else:
+        return HttpResponse(json.dumps({"Message": "Student Profile Not Created"}))
+    
+
+# old code on sign in
+@csrf_exempt
+def signin(request):
+      if request.method == 'POST':
+        username = request.POST['username']
+        pass1 = request.POST['pass1']
+        user = request.POST['usertype']
+        
+        user = authenticate(username=username, password=pass1, user_type=user)
+        
+        if user is not None:
+            login(request, user)
+            fname = user.first_name
+            return HttpResponse(json.dumps({"msg": " Sucessfully Logged In ","status":True}),content_type="application/json",)
+            messages.success(request, "Logged In Sucessfully!!")
+            
+        else:
+            messages.error(request, "Bad Credentials!!")
+    
+      return HttpResponse(json.dumps({"msg": " Bad Request ","status":False}),content_type="application/json",)
+
+
+# // new way
 # @csrf_exempt
-# def resultExcel(request):
-#     if request.method == "POST":
-#         file = request.FILES.get('excel_file')
-#         if not file:
-#             return HttpResponse(json.dumps({"Error": "No file uploaded"}), status=400)
-#         try:
-#             df = pd.read_excel(file)
-#             subject_columns = [col for col in df.columns if col.startswith('subject')]
-#             for index, row in df.iterrows():
-#                 student_name = row['student']
-#                 exam_type = row['exam type']
-#                 semester = row['semester']
-#                 currriculum_year = row['currriculum_year']
-#                 exam_year = row['exam_year']
-#                 grade = row['grade']
-#                 marks = row['marks']
-                
-#                 # Handling multiple students with the same name
-#                 students = Student.objects.filter(name=student_name)
-#                 if students.exists():
-#                     student = students.first()  # Get the first student with the given name
-#                 else:
-#                     student = Student.objects.create(name=student_name)
-#                 for subject_column in subject_columns:
-#                     subject_name = row[subject_column]
-#                     try:  
-#                         subject_obj = Subject.objects.filter(subject_name=subject_name).first()
-#                         result, created = Result.objects.get_or_create(student=student, subject=subject_obj, type_of_exam=exam_type, semester=semester,grade=grade, marks=marks ,exam_year=exam_year, currriculum_year=currriculum_year)
-#                         print(subject_columns)
-#                         # ['subject Dhiraj Suthar']
-#                         print(f"Processed {student_name}, Subject: {subject_name}, Exam Type: {exam_type}")
-#                     except Result.MultipleObjectsReturned:
-#                         print(subject_columns)
-#                         subject_obj = Subject.objects.filter(subject_name=subject_name).first()
-#                         Result.objects.filter(student=student, subject=subject_obj, type_of_exam=exam_type).delete()
-#                         result, created = Result.objects.get_or_create(student=student, subject=subject_obj, grade=grade, marks=marks  , type_of_exam=exam_type, semester=semester, exam_year=exam_year, currriculum_year=currriculum_year)
-#                         print(f"Processed {student_name}, Subject: {subject_name}, Exam Type: {exam_type}")
-#             return HttpResponse(json.dumps({"Message": "Success"}))
-#         except Exception as e:
-#             print(f"Error: {e}")
-#             return HttpResponse(json.dumps({"Error": str(e)}), status=500)
-#     else:
-#         return HttpResponse(json.dumps({"Error": "Only POST requests are allowed"}), status=405)
+# def signin(request):
+#       if request.method == 'POST':
+#         username = request.POST['username']
+#         pass1 = request.POST['pass1']
+        
+#         user = authenticate(username=username, password=pass1)
+       
+#         if user is not None:
+    
+#             login(request, user)
+#             fname = user.first_name
+#             return HttpResponse(json.dumps({"msg": " Sucessfully Logged In ","status":True}),content_type="application/json")
+#             messages.success(request, "Logged In Sucessfully!!")
+#             # , "user_type" : user.user_type
+#         else:
+#             messages.error(request, "Bad Credentials!!")
+    
+#       return HttpResponse(json.dumps({"msg": " Bad Request ","status":False}),content_type="application/json",)
+
+
+
+
+
+
+
+
+
+
+
+    
+@csrf_exempt
+def studentLogin(request):
+    if request.method == "POST":
+        enrollment = request.POST.get("enrollment")
+        password = request.POST.get("password")
+
+        user = StudentProfile.objects.filter(username=enrollment, password=password).exists()
+
+        if user:
+            return HttpResponse(json.dumps({"Message" : "Logged In"}))
+        else:
+            return HttpResponse(json.dumps({"Message" : "Invalid Creddentials"}))
+    else:
+        return HttpResponse(json.dumps({"Message" : "Bad Request"}))
+    
+    
+@csrf_exempt
+def IsStudentProfile(request):
+    if request.method == "POST":
+        enrollment = request.POST.get("enrollment")
+    
+        user = StudentProfile.objects.filter(username=enrollment ).exists()
+
+        if user:
+            return HttpResponse(json.dumps({"Message" : "Student Found","status":"true"}))
+        else:
+            return HttpResponse(json.dumps({"Message" : "Student Not Found","status":"false"}))
+    else:
+        return HttpResponse(json.dumps({"Message" : "Bad Request"}))
+    
+    
+    
+@csrf_exempt
+def editStudent(request):
+    if request.method == "POST":
+        enrollment = request.POST.get("enrollment")
+        try:
+            student_instance = Student.objects.get(enrollment=enrollment)
+        except Student.DoesNotExist:
+            return JsonResponse({"msg": "Student does not exist"}, status=404)
+
+        # Access JSON data directly from request.POST
+        data = json.loads(request.POST.get("data"))  # Assuming the JSON data is sent as "data" parameter
+
+        # Update fields based on the received data
+        for field, value in data.items():
+            setattr(student_instance, field, value)
+
+        # Save the updated instance
+        student_instance.save()
+        return HttpResponse(json.dumps({"msg": "Success"}))
+    else:
+        return HttpResponse(json.dumps({"msg": "Bad request"}))
+
+
+# old
+# @csrf_exempt
+# def passOutTick(request):
+#     students = Student.objects.all()
+#     current_year = datetime.datetime.now().year
+    
+#     for student in students:
+#         nums = student.department.number_of_semesters / 2
+#         # print(student.department.number_of_semesters)
+#         student.mentoring_started_year.year + nums >= current_year
+#         student.passed_out = True
+#         student.save()
+#     return HttpResponse(json.dumps({'success': 'True'}))
+    
+
+
+# chatgpt
+@csrf_exempt
+def passOutTick(request):
+    students = Student.objects.all()
+    current_year = datetime.datetime.now().year
+    
+    for student in students:
+        if student.department is not None:  # Check if department is not None
+            nums = student.department.number_of_semesters / 2
+            if student.mentoring_started_year.year + nums >= current_year:
+                student.passed_out = True
+               
+                student.save()
+            else:
+                student.passed_out = False
+                student.save()
+    
+    return HttpResponse(json.dumps({'success': 'True'}))

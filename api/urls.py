@@ -15,4 +15,10 @@ urlpatterns = [
     path("mentors/", views.mentors, name='mentors'),
     path("mentorshipForm/", views.addStudent, name='MentorData'),
     path("resultExcel/", views.resultExcel, name='resultExcel'),
+    path("createStudentProgile/", views.createStudentProfile, name='createStudentProfile'),
+    path("studentLogin/", views.studentLogin, name='studentLogin'),
+    path("editStudent/", views.editStudent, name='editStudent'),
+    path("IsStudentProfile/", views.IsStudentProfile, name='IsStudentProfile'),
+    path("specificStudent/", views.specificStudent, name='specificStudent'),
+    path("passOutTick/", views.passOutTick, name='passOutTick'),
 ]
