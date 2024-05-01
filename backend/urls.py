@@ -23,6 +23,16 @@ urlpatterns = [
     path("api/", include("api.urls")),
     path('', TemplateView.as_view(template_name='index.html')),
     path("Signup", TemplateView.as_view(template_name='index.html')),
+    path("Login", TemplateView.as_view(template_name='index.html')),
+    
+    path("Students", TemplateView.as_view(template_name='index.html')),
+    path("Students/", TemplateView.as_view(template_name='index.html')),
+    path("Students/attendences", TemplateView.as_view(template_name='index.html')),
+    path("Students/results", TemplateView.as_view(template_name='index.html')),
+    path("Students/feesDetails", TemplateView.as_view(template_name='index.html')),
+  
+
+    
     
     path("MainMentorship", TemplateView.as_view(template_name='index.html')),
     path("MainMentorship/", TemplateView.as_view(template_name='index.html')),
