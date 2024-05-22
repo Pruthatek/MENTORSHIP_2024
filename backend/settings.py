@@ -33,7 +33,8 @@ ALLOWED_HOSTS = ["*"]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:8000",
-    "http://localhost:5173"
+    "http://localhost:5173",
+    "https://seahorse-app-67utq.ondigitalocean.app"
 ]
 
 INSTALLED_APPS = [
@@ -129,14 +130,13 @@ USE_TZ = True
 
  
 STATIC_URL = '/static/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_URL = '/media/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [
-    # os.path.join(BASE_DIR, 'static'),
-    os.path.join(BASE_DIR, 'static/admin'),
-    os.path.join(BASE_DIR, 'static/import_export'),
+    BASE_DIR,'static'
 ]
+
 
 
 
